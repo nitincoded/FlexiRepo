@@ -17,6 +17,7 @@ public class Repo {
     public static void main(String args[]) throws Exception {
         int i_portNo = 2020;
 
+        log.finest(String.format("API version: {0}", 20170913));
         log.finest(String.format("Attempting to start on port {0}", i_portNo));
         port(i_portNo);
 
