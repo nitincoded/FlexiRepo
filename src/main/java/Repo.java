@@ -5,6 +5,7 @@ import static spark.Spark.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
@@ -15,13 +16,29 @@ public class Repo {
     static Logger log = Logger.getLogger(Repo.class.getName());
 
     public static void main(String args[]) throws Exception {
+        //Either load it here, or force the user to set the property java.util.logging.config.file using the -D VM argument
+        String[] paths = new String[] {
+                System.getProperty("user.dir") + "/target/classes/logging.properties",
+                "logging.properties"
+        };
+        for (String iterPath : paths) {
+            if (new java.io.File(iterPath).exists()) {
+                LogManager.getLogManager().readConfiguration(new java.io.FileInputStream(iterPath));
+                log.finest("Loaded logger config from " + iterPath);
+                break;
+            } else {
+//                log.finest("Default logger config");
+            }
+        }
+
         int i_portNo = 2020;
 
-        log.finest(String.format("API version: {0}", 20170913));
-        log.finest(String.format("Attempting to start on port {0}", i_portNo));
-        port(i_portNo);
+        log.finest("Executing from " + Repo.class.getProtectionDomain().getCodeSource().getLocation().getPath());
+        log.finest("Working directory " + System.getProperty("user.dir"));
+        log.info(String.format("API version: %d", 20170913));
+        log.info(String.format("Attempting to start on port %d", i_portNo));
 
-        log.finest("");
+        port(i_portNo);
 
         get("/query", Repo::getExecuteQuery);
         get("/execute", Repo::getpostExecuteNonQuery);
@@ -45,8 +62,12 @@ public class Repo {
 //            st.close();
             conn.close();
         }
+        catch (Exception ex) {
+            log.warning(ex.getMessage());
+            throw ex;
+        }
         finally {
-            try { conn.close(); } catch (Exception ex) {}
+            try { conn.close(); } catch (Exception ex) { log.warning(ex.getMessage()); }
         }
     }
 
@@ -82,10 +103,11 @@ public class Repo {
             return gson.toJson(data);
         }
         catch (Exception ex) {
+            log.warning(ex.getMessage());
             throw ex;
         }
         finally {
-            try { conn.close(); } catch (Exception nex) {}
+            try { conn.close(); } catch (Exception ex) { log.warning(ex.getMessage()); }
         }
     }
 
