@@ -15,8 +15,12 @@ public class Repo {
     static Gson gson = new Gson();
     static Logger log = Logger.getLogger(Repo.class.getName());
 
-    public static void main(String args[]) throws Exception {
-        //Either load it here, or force the user to set the property java.util.logging.config.file using the -D VM argument
+    /**
+     * Loads the logging level configuration and logger handler info
+     * @throws Exception
+     */
+    private static void loadLoggerConfig() throws Exception {
+        //Why force the user to set the property java.util.logging.config.file using the -D VM argument?
         String[] paths = new String[] {
                 System.getProperty("user.dir") + "/target/classes/logging.properties",
                 "logging.properties"
@@ -30,6 +34,15 @@ public class Repo {
 //                log.finest("Default logger config");
             }
         }
+    }
+
+    /**
+     * Program entry point
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String args[]) throws Exception {
+        loadLoggerConfig();
 
         int i_portNo = 2020;
 
@@ -45,14 +58,35 @@ public class Repo {
         post("/execute", Repo::getpostExecuteNonQuery);
     }
 
+    /**
+     *
+     * @param req
+     * @param res
+     * @return
+     * @throws Exception
+     */
     public static String getExecuteQuery(Request req, Response res) throws Exception {
         return executeQuery(req.queryParams("jdbcUrl"), req.queryParams("sql"));
     }
+
+    /**
+     *
+     * @param req
+     * @param res
+     * @return
+     * @throws Exception
+     */
     public static String getpostExecuteNonQuery(Request req, Response res) throws Exception {
         executeNonQuery(req.queryParams("jdbcUrl"), req.queryParams("sql"));
         return "OK";
     }
 
+    /**
+     *
+     * @param jdbcUrl
+     * @param sql
+     * @throws Exception
+     */
     public static void executeNonQuery(String jdbcUrl, String sql) throws Exception {
         Connection conn = null;
         try {
@@ -71,12 +105,21 @@ public class Repo {
         }
     }
 
+    /**
+     *
+     * @param jdbcUrl
+     * @param sql
+     * @return
+     * @throws Exception
+     */
     public static String executeQuery(String jdbcUrl, String sql) throws Exception {
         Connection conn = null;
         try {
             conn = getConnectionForUrl(jdbcUrl);
             Statement st = conn.createStatement();
             ResultSet rset = st.executeQuery(sql);
+
+            HashMap<String, Object> retval = new HashMap<String, Object>();
 
             ArrayList<String> lstColumnNames = new ArrayList<>();
             ArrayList<HashMap<String, Object>> data = new ArrayList<>();
@@ -100,7 +143,10 @@ public class Repo {
             st.close();
             conn.close();
 
-            return gson.toJson(data);
+            retval.put("data", data);
+
+            return gson.toJson(retval);
+//            return gson.toJson(data);
         }
         catch (Exception ex) {
             log.warning(ex.getMessage());
@@ -111,6 +157,12 @@ public class Repo {
         }
     }
 
+    /**
+     *
+     * @param url
+     * @return
+     * @throws Exception
+     */
     public static Connection getConnectionForUrl(String url) throws Exception {
         if (url.startsWith("jdbc:sqlserver") || url.startsWith("jdbc:mssql")) {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
