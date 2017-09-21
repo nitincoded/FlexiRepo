@@ -20,20 +20,30 @@ public class Repo {
      * @throws Exception
      */
     private static void loadLoggerConfig() throws Exception {
-        //Why force the user to set the property java.util.logging.config.file using the -D VM argument?
+        //An alternative to loading the config through custom code is to set the property java.util.logging.config.file using the -D VM argument
+
         String[] paths = new String[] {
                 System.getProperty("user.dir") + "/target/classes/logging.properties",
-                "logging.properties"
+                System.getProperty("user.dir") + "/logging.properties"
         };
+        boolean isLoggingConfigFileFound = false;
+
         for (String iterPath : paths) {
             if (new java.io.File(iterPath).exists()) {
                 LogManager.getLogManager().readConfiguration(new java.io.FileInputStream(iterPath));
                 log.finest("Loaded logger config from " + iterPath);
+                isLoggingConfigFileFound = true;
                 break;
-            } else {
-//                log.finest("Default logger config");
             }
         }
+
+        if (!isLoggingConfigFileFound){
+            log.info("No logger config file found");
+        }
+    }
+
+    private static void loadGeneralConfig() throws Exception {
+
     }
 
     /**
@@ -43,6 +53,7 @@ public class Repo {
      */
     public static void main(String args[]) throws Exception {
         loadLoggerConfig();
+        loadGeneralConfig();
 
         int i_portNo = 2020;
 
