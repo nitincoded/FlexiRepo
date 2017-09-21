@@ -14,6 +14,8 @@ To execute an SQL query without fetching results, send a GET or POST request to 
 
 ## Example
 
+Ruby code snippet
+
 ```
 s_uenc_jdbc = CGI.escape('jdbc:mysql://127.0.0.1/mydb?useLegacyDatetimeCode=false%26serverTimezone=Asia/Dubai%26user=root%26password=donttellanyone')
 s_uenc_sql = CGI.escape('SELECT * FROM chocolate')
