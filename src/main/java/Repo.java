@@ -179,6 +179,10 @@ public class Repo {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
         } else if (url.startsWith("jdbc:mysql")) {
             Class.forName("com.mysql.jdbc.Driver").newInstance();
+        } else if (url.startsWith("jdbc:sqlite")) {
+            //TODO
+        } else if (url.startsWith("jdbc:oracle")) {
+            //TODO
         }
 
         return DriverManager.getConnection(url);
