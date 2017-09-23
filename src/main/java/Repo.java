@@ -175,14 +175,28 @@ public class Repo {
      * @throws Exception
      */
     public static Connection getConnectionForUrl(String url) throws Exception {
-        if (url.startsWith("jdbc:sqlserver") || url.startsWith("jdbc:mssql")) {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
-        } else if (url.startsWith("jdbc:mysql")) {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        } else if (url.startsWith("jdbc:sqlite")) {
-            //TODO
-        } else if (url.startsWith("jdbc:oracle")) {
-            //TODO
+        try {
+            //The .newInstance() call is for quirky JVMs
+
+            if (url.startsWith("jdbc:sqlserver") || url.startsWith("jdbc:mssql")) {
+                log.fine("Instantiating MS SQL Server JDBC driver");
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
+            } else if (url.startsWith("jdbc:mysql")) {
+                log.fine("Instantiating MySQL JDBC driver");
+                Class.forName("com.mysql.jdbc.Driver").newInstance();
+            } else if (url.startsWith("jdbc:sqlite")) {
+                log.fine("Instantiating SQLite JDBC driver");
+                Class.forName("org.sqlite.JDBC").newInstance();
+            } else if (url.startsWith("jdbc:oracle")) {
+                log.fine("Instantiating Oracle JDBC driver");
+                Class.forName("oracle.jdbc.OracleDriver").newInstance();
+            } else if (url.startsWith("jdbc:postgresql")) {
+                log.fine("Instantiating PostgreSQL JDBC driver");
+                Class.forName("org.postgresql.Driver").newInstance();
+            }
+        }
+        catch (Exception ex) {
+            log.info(ex.getMessage());
         }
 
         return DriverManager.getConnection(url);
