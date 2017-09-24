@@ -59,7 +59,7 @@ public class Repo {
     }
 
     /**
-     *
+     * Handles the GET /query route
      * @param req
      * @param res
      * @return
@@ -70,7 +70,7 @@ public class Repo {
     }
 
     /**
-     *
+     * Handles the POST /execute route
      * @param req
      * @param res
      * @return
@@ -82,12 +82,12 @@ public class Repo {
     }
 
     /**
-     *
+     * Handles the GET /execute route
      * @param jdbcUrl
      * @param sql
      * @throws Exception
      */
-    public static void executeNonQuery(String jdbcUrl, String sql) throws Exception {
+    private static void executeNonQuery(String jdbcUrl, String sql) throws Exception {
         Connection conn = null;
         try {
             conn = getConnectionForUrl(jdbcUrl);
@@ -112,7 +112,7 @@ public class Repo {
      * @return
      * @throws Exception
      */
-    public static String executeQuery(String jdbcUrl, String sql) throws Exception {
+    private static String executeQuery(String jdbcUrl, String sql) throws Exception {
         Connection conn = null;
         try {
             conn = getConnectionForUrl(jdbcUrl);
@@ -146,7 +146,6 @@ public class Repo {
             retval.put("data", data);
 
             return gson.toJson(retval);
-//            return gson.toJson(data);
         }
         catch (Exception ex) {
             log.warning(ex.getMessage());
@@ -163,7 +162,7 @@ public class Repo {
      * @return
      * @throws Exception
      */
-    public static Connection getConnectionForUrl(String url) throws Exception {
+    private static Connection getConnectionForUrl(String url) throws Exception {
         if (url.startsWith("jdbc:sqlserver") || url.startsWith("jdbc:mssql")) {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
         } else if (url.startsWith("jdbc:mysql")) {
