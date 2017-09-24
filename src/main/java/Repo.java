@@ -14,6 +14,8 @@ import java.util.logging.Logger;
 public class Repo {
     static Gson gson = new Gson();
     static Logger log = Logger.getLogger(Repo.class.getName());
+    static java.util.Properties props = new java.util.Properties();
+    static java.util.Properties dbinfo = new java.util.Properties();
 
     /**
      * Loads the logging level configuration and logger handler info
@@ -42,8 +44,43 @@ public class Repo {
         }
     }
 
+    /**
+     * Loads the configuration for the application
+     * @throws Exception
+     */
     private static void loadGeneralConfig() throws Exception {
+        String cfgFilename = System.getProperty("user.dir") + "/" + "flexirepo.properties";
+        String dbinfoFilename = System.getProperty("user.dir") + "/" + "dbinfo.properties";
 
+        if (new java.io.File(cfgFilename).exists()) {
+            log.info("Loading config file: " + cfgFilename);
+            java.io.FileInputStream fis = null;
+
+            try {
+                fis = new java.io.FileInputStream(cfgFilename);
+                props.load(fis);
+            }
+            finally {
+                try { fis.close(); } catch(Exception ex) {}
+            }
+        } else {
+            log.info("Config file doesn't exist: " + cfgFilename);
+        }
+
+        if (new java.io.File(dbinfoFilename).exists()) {
+            log.info("Loading dbinfo file: " + dbinfoFilename);
+            java.io.FileInputStream fis = null;
+
+            try {
+                fis = new java.io.FileInputStream(dbinfoFilename);
+                dbinfo.load(fis);
+            }
+            finally {
+                try { fis.close(); } catch(Exception ex) {}
+            }
+        } else {
+            log.info("dbinfo file doesn't exist: " + dbinfoFilename);
+        }
     }
 
     /**
