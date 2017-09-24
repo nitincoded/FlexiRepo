@@ -20,20 +20,30 @@ public class Repo {
      * @throws Exception
      */
     private static void loadLoggerConfig() throws Exception {
-        //Why force the user to set the property java.util.logging.config.file using the -D VM argument?
+        //An alternative to loading the config through custom code is to set the property java.util.logging.config.file using the -D VM argument
+
         String[] paths = new String[] {
                 System.getProperty("user.dir") + "/target/classes/logging.properties",
-                "logging.properties"
+                System.getProperty("user.dir") + "/logging.properties"
         };
+        boolean isLoggingConfigFileFound = false;
+
         for (String iterPath : paths) {
             if (new java.io.File(iterPath).exists()) {
                 LogManager.getLogManager().readConfiguration(new java.io.FileInputStream(iterPath));
                 log.finest("Loaded logger config from " + iterPath);
+                isLoggingConfigFileFound = true;
                 break;
-            } else {
-//                log.finest("Default logger config");
             }
         }
+
+        if (!isLoggingConfigFileFound){
+            log.info("No logger config file found");
+        }
+    }
+
+    private static void loadGeneralConfig() throws Exception {
+
     }
 
     /**
@@ -43,6 +53,7 @@ public class Repo {
      */
     public static void main(String args[]) throws Exception {
         loadLoggerConfig();
+        loadGeneralConfig();
 
         int i_portNo = 2020;
 
@@ -162,11 +173,29 @@ public class Repo {
      * @return
      * @throws Exception
      */
-    private static Connection getConnectionForUrl(String url) throws Exception {
-        if (url.startsWith("jdbc:sqlserver") || url.startsWith("jdbc:mssql")) {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
-        } else if (url.startsWith("jdbc:mysql")) {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+    public static Connection getConnectionForUrl(String url) throws Exception {
+        try {
+            //The .newInstance() call is for quirky JVMs
+
+            if (url.startsWith("jdbc:sqlserver") || url.startsWith("jdbc:mssql")) {
+                log.fine("Instantiating MS SQL Server JDBC driver");
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver").newInstance();
+            } else if (url.startsWith("jdbc:mysql")) {
+                log.fine("Instantiating MySQL JDBC driver");
+                Class.forName("com.mysql.jdbc.Driver").newInstance();
+            } else if (url.startsWith("jdbc:sqlite")) {
+                log.fine("Instantiating SQLite JDBC driver");
+                Class.forName("org.sqlite.JDBC").newInstance();
+            } else if (url.startsWith("jdbc:oracle")) {
+                log.fine("Instantiating Oracle JDBC driver");
+                Class.forName("oracle.jdbc.OracleDriver").newInstance();
+            } else if (url.startsWith("jdbc:postgresql")) {
+                log.fine("Instantiating PostgreSQL JDBC driver");
+                Class.forName("org.postgresql.Driver").newInstance();
+            }
+        }
+        catch (Exception ex) {
+            log.info(ex.getMessage());
         }
 
         return DriverManager.getConnection(url);
