@@ -103,7 +103,8 @@ public class Repo {
         try {
             conn = getConnectionForUrl(jdbcUrl);
             Statement st = conn.createStatement();
-            st.executeQuery(sql);
+//            st.executeQuery(sql); //this will complain about not getting a resultset by tossing an exception
+            st.execute(sql);
 //            st.close();
             conn.close();
         }
