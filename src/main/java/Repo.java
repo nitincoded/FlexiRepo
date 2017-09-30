@@ -1,3 +1,8 @@
+/**
+ * Author(s): Nitin Reddy
+ * Created On: September 13, 2017
+ */
+
 import com.google.gson.Gson;
 import spark.Request;
 import spark.Response;
@@ -9,12 +14,28 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
- * Created by Nitin Reddy on 9/13/17.
+ * Contains the program entry point
+ * Currently also has all of the code for the application
  */
 public class Repo {
+    /**
+     * JSON encoder
+     */
     static Gson gson = new Gson();
+
+    /**
+     * For logging messages from the Repo class
+     */
     static Logger log = Logger.getLogger(Repo.class.getName());
+
+    /**
+     * General program configuration
+     */
     static java.util.Properties props = new java.util.Properties();
+
+    /**
+     * Database configuration
+     */
     static java.util.Properties dbinfo = new java.util.Properties();
 
     /**
@@ -85,7 +106,7 @@ public class Repo {
 
     /**
      * Program entry point
-     * @param args
+     * @param args Command line arguments
      * @throws Exception
      */
     public static void main(String args[]) throws Exception {
@@ -108,9 +129,9 @@ public class Repo {
 
     /**
      * Handles the GET /query route
-     * @param req
-     * @param res
-     * @return
+     * @param req Request object
+     * @param res Response object
+     * @return Content to return to the HTTP client
      * @throws Exception
      */
     public static String getExecuteQuery(Request req, Response res) throws Exception {
@@ -119,9 +140,9 @@ public class Repo {
 
     /**
      * Handles the POST /execute route
-     * @param req
-     * @param res
-     * @return
+     * @param req Request object
+     * @param res Response object
+     * @return Content to return to the HTTP client
      * @throws Exception
      */
     public static String getpostExecuteNonQuery(Request req, Response res) throws Exception {
@@ -131,8 +152,8 @@ public class Repo {
 
     /**
      * Handles the GET /execute route
-     * @param jdbcUrl
-     * @param sql
+     * @param jdbcUrl JDBC URL to the database
+     * @param sql SQL statement as a string
      * @throws Exception
      */
     private static void executeNonQuery(String jdbcUrl, String sql) throws Exception {
@@ -155,10 +176,10 @@ public class Repo {
     }
 
     /**
-     *
-     * @param jdbcUrl
-     * @param sql
-     * @return
+     * Executes an SQL statement that returns a resultset, returning a JSON string
+     * @param jdbcUrl JDBC URL to the database
+     * @param sql SQL statement as a string
+     * @return JSON string with resultset
      * @throws Exception
      */
     private static String executeQuery(String jdbcUrl, String sql) throws Exception {
@@ -206,9 +227,9 @@ public class Repo {
     }
 
     /**
-     *
-     * @param url
-     * @return
+     * Returns the DB connection object for the provided JDBC URL
+     * @param url JDBC URL with authentication information
+     * @return Connection object
      * @throws Exception
      */
     public static Connection getConnectionForUrl(String url) throws Exception {
